@@ -88,22 +88,40 @@ jobs:
       - name: Linting
         run: cargo clippy -- -D warnings
 
- check:
-   - name: Install cargo check tools
-     run: |
-       cargo install --locked cargo-deny || true
-       cargo install --locked cargo-outdated || true
-       cargo install --locked cargo-udeps || true
-       cargo install --locked cargo-audit || true
-        cargo install --locked cargo-pants
-   - name: Check
-     run: |
-       cargo deny check
-       cargo outdated --exit-code 1
-       cargo udeps
-       rm -rf ~/.cargo/advisory-db
-       cargo audit
-       cargo pants
+  check:
+    name: Cargo check dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Setup cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+      - name: Install cargo check tools
+        run: |
+          cargo install --locked cargo-deny || true
+          cargo install --locked cargo-outdated || true
+          cargo install --locked cargo-udeps || true
+          cargo install --locked cargo-audit || true
+          cargo install --locked cargo-pants
+      - name: Check
+        run: |
+          cargo deny check
+          cargo outdated --exit-code 1
+          cargo udeps
+          rm -rf ~/.cargo/advisory-db
+          cargo audit
+          cargo pants
 
   coverage:
     name: Code coverage

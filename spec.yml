@@ -22,6 +22,9 @@ services:
       - key: APP_DATABASE__PASSWORD
         scope: RUN_TIME
         value: ${newsletter.PASSWORD}
+      - key: APP_DATABASE__HOST
+        scope: RUN_TIME
+        value: ${newsletter.HOSTNAME}
       - key: APP_DATABASE__PORT
         scope: RUN_TIME
         value: ${newsletter.PORT}

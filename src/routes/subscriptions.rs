@@ -1,8 +1,8 @@
+use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
-use crate::domain::{NewSubscriber, SubscriberName, SubscriberEmail};
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -21,10 +21,7 @@ impl TryFrom<FormData> for NewSubscriber {
 }
 
 #[allow(clippy::async_yields_async)]
-#[tracing::instrument(
-    name = "Adding a new subscriber",
-    skip(form, pool)
-)]
+#[tracing::instrument(name = "Adding a new subscriber", skip(form, pool))]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
     let new_subscriber = match form.0.try_into() {
         Ok(subscriber) => subscriber,
@@ -37,8 +34,14 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
     }
 }
 
-#[tracing::instrument(name = "Saving new subscriber details in the DB", skip(new_subscriber, pool))]
-pub async fn insert_subscriber(pool: &PgPool, new_subscriber: &NewSubscriber) -> Result<(), sqlx::Error> {
+#[tracing::instrument(
+    name = "Saving new subscriber details in the DB",
+    skip(new_subscriber, pool)
+)]
+pub async fn insert_subscriber(
+    pool: &PgPool,
+    new_subscriber: &NewSubscriber,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)

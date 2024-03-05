@@ -1,4 +1,4 @@
-use validator::validate_email;  // TODO: upgrade to V0.17
+use validator::validate_email; // TODO: upgrade to V0.17
 
 #[derive(Debug)]
 pub struct SubscriberEmail(String);
@@ -7,8 +7,7 @@ impl SubscriberEmail {
     pub fn parse(s: String) -> Result<SubscriberEmail, String> {
         if validate_email(&s) {
             Ok(Self(s))
-        }
-        else {
+        } else {
             Err(format!("{} is not a valid subscriber email.", s))
         }
     }
@@ -68,5 +67,3 @@ mod tests {
         assert_err!(SubscriberEmail::parse(email));
     }
 }
-
-
